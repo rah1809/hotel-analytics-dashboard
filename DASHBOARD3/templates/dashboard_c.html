@@ -1,0 +1,292 @@
+{% extends "layout.html" %}
+{% block title %}Operational Dashboard{% endblock %}
+{% block content %}
+<style>
+  .operational-header { color: #009688; }
+  .operational-highlight { background-color: #FDD8351A; }
+  .operational-btn { background-color: #009688; color: #fff; }
+  .operational-btn:hover { background-color: #FDD835; color: #333; }
+</style>
+<div class="space-y-8">
+    <!-- Header Section -->
+    <div class="text-center">
+        <h1 class="operational-header text-3xl font-bold mb-2">Operational Dashboard</h1>
+        <p class="text-gray-600">Real-time insights into hotel operations and performance metrics</p>
+    </div>
+
+    <!-- Context Section: Key Performance Indicators -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+        <div class="bg-white p-4 rounded-2xl shadow h-96 flex flex-col">
+            <h2 class="text-lg font-semibold mb-2">Booking Cancellation Rate</h2>
+            <p class="chart-caption text-gray-500 text-xs mb-2">Shows the percentage of canceled bookings for City and Resort hotels to help identify risk levels and instability in guest behavior.</p>
+            <div class="flex-1 flex items-center justify-center h-72">
+                <canvas id="cancellationRateChart" class="w-full h-full"></canvas>
+            </div>
+            <div id="cancellationRateChart-error" class="text-red-500 mt-2" style="display:none;"></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow h-96 flex flex-col">
+            <h2 class="text-lg font-semibold mb-2">Average Daily Rate (ADR)</h2>
+            <p class="chart-caption text-gray-500 text-xs mb-2">Displays the average daily rate (ADR) across hotel property codes, helping operations monitor pricing trends and rate competitiveness.</p>
+            <div class="flex-1 flex items-center justify-center h-72">
+                <canvas id="adrByRoomChart" class="w-full h-full"></canvas>
+            </div>
+            <div id="adrByRoomChart-error" class="text-red-500 mt-2" style="display:none;"></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow h-96 flex flex-col">
+            <h2 class="text-lg font-semibold mb-2">Channel Distribution</h2>
+            <p class="chart-caption text-gray-500 text-xs mb-2">Visualizes the share of bookings coming from different distribution channels (TA/TO, Direct, GDS, etc.) to assess marketing and platform reliance.</p>
+            <div class="flex-1 flex items-center justify-center h-72">
+                <canvas id="channelDistributionChart" class="w-full h-full"></canvas>
+            </div>
+            <div id="channelDistributionChart-error" class="text-red-500 mt-2" style="display:none;"></div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl shadow h-96 flex flex-col">
+            <h2 class="text-lg font-semibold mb-2">Monthly Trends</h2>
+            <p class="chart-caption text-gray-500 text-xs mb-2">Tracks the number of bookings over time to reveal seasonal patterns, spikes, or drops in guest traffic that affect staffing and resources.</p>
+            <div class="flex-1 flex items-center justify-center h-72">
+                <canvas id="monthlyTrendsChart" class="w-full h-full"></canvas>
+            </div>
+            <div id="monthlyTrendsChart-error" class="text-red-500 mt-2" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Deep Dive Section: Additional Insights -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+        <div class="bg-white p-4 rounded-2xl shadow h-96 flex flex-col">
+            <h2 class="text-lg font-semibold mb-2">Special Requests by Hotel</h2>
+            <p class="chart-caption text-gray-500 text-xs mb-2">Shows the volume of guest special requests submitted by City and Resort hotels to support service resource allocation and guest satisfaction efforts.</p>
+            <div class="flex-1 flex items-center justify-center h-72">
+                <canvas id="specialRequestsByHotel" class="w-full h-full"></canvas>
+            </div>
+            <div id="specialRequestsByHotel-error" class="text-red-500 mt-2" style="display:none;"></div>
+        </div>
+        <!-- Top 10 Countries chart removed -->
+    </div>
+</div>
+
+<script>
+// Chart.js Global Configuration
+Chart.defaults.color = '#666';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(57, 73, 171, 0.9)';
+Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.cornerRadius = 4;
+
+// Common chart options
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+        duration: 1000,
+        easing: 'easeInOutQuart'
+    },
+    plugins: {
+        legend: {
+            position: 'top',
+            labels: {
+                padding: 20,
+                font: {
+                    size: 12
+                }
+            }
+        }
+    }
+};
+
+async function safeFetch(url) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Network response was not ok');
+        const data = await res.json();
+        console.log(url, data);
+        return data;
+    } catch (e) {
+        console.error('Fetch error:', url, e);
+        return null;
+    }
+}
+
+async function renderCharts() {
+    // Context Section Charts
+    // Cancellation Rate Chart
+    fetch('/api/cancellation_rate')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('cancellationRateChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.hotel),
+                    datasets: [{
+                        label: 'Cancellation Rate (%)',
+                        data: data.map(item => item.cancellation_rate),
+                        backgroundColor: data.map(item => item.hotel === 'City' ? '#3949AB' : (item.hotel === 'Resort' ? '#FF6F61' : '#3949AB')),
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Cancellation Rate (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    // ADR by Room Type Chart
+    fetch('/api/adr_by_room')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('adrByRoomChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.assigned_room_type),
+                    datasets: [{
+                        label: 'Average Daily Rate',
+                        data: data.map(item => item.avg_rate),
+                        backgroundColor: '#009688',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Rate ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    // Channel Distribution Chart
+    fetch('/api/channel_distribution')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('channelDistributionChart'), {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.channel),
+                    datasets: [{
+                        data: data.map(item => item.count),
+                        backgroundColor: ['#3949AB', '#009688', '#36b9cc', '#f6c23e']
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        });
+
+    // Monthly Trends Chart
+    fetch('/api/monthly_trends')
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(item => `${item.month} ${item.arrival_date_year}`);
+            new Chart(document.getElementById('monthlyTrendsChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Bookings',
+                        data: data.map(item => item.bookings),
+                        borderColor: '#3949AB',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Bookings'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    // Deep Dive Section Charts
+    // Special Requests by Hotel
+    const specialData = await safeFetch("/api/operational/special-requests-by-hotel");
+    if (specialData && Array.isArray(specialData) && specialData.length) {
+        new Chart(document.getElementById("specialRequestsByHotel"), {
+            type: "bar",
+            data: {
+                labels: specialData.map(item => item.hotel),
+                datasets: [{
+                    label: 'Special Requests',
+                    data: specialData.map(item => item.total_of_special_requests),
+                    backgroundColor: specialData.map(item => item.hotel === 'City' ? '#3949AB' : (item.hotel === 'Resort' ? '#2ECC71' : '#3949AB')),
+                    borderColor: '#888',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: commonOptions
+        });
+    } else {
+        document.getElementById("specialRequestsByHotel-error").style.display = 'block';
+        document.getElementById("specialRequestsByHotel-error").innerText = 'No data available for special requests by hotel.';
+    }
+
+    // Top 10 Countries (now Top 5 Donut Chart with strong colors and bright labels)
+    const countryData = await safeFetch("/api/operational/top-countries");
+    if (countryData && countryData.labels && countryData.data && countryData.data.length) {
+        new Chart(document.getElementById("topCountries"), {
+            type: "doughnut",
+            data: {
+                labels: countryData.labels.slice(0, 5),
+                datasets: [{
+                    label: "Bookings",
+                    data: countryData.data.slice(0, 5),
+                    backgroundColor: [
+                        '#8E24AA', // PRT - Purple 600
+                        '#3949AB', // GBR - Indigo 600
+                        '#1976D2', // FRA - Deep Blue
+                        '#43A047', // ESP - Green
+                        '#FFA726'  // DEU - Orange
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    legend: { position: 'right' },
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold', size: 14 },
+                        formatter: (value, ctx) => ctx.chart.data.labels[ctx.dataIndex]
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    } else {
+        document.getElementById("topCountries-error").style.display = 'block';
+        document.getElementById("topCountries-error").innerText = 'No data available for top countries.';
+    }
+}
+
+renderCharts();
+</script>
+{% endblock %} 

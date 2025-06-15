@@ -1,0 +1,13 @@
+date,continent,hotel_type,market_segment,channel,meal_plan,booking_lead_time,revenue,bookings,cancellations,customer_type,special_requests,country,adr,stay_duration,booking_status,total_requests
+2024-01,Europe,City,Corporate,Direct,BB,30,15000,25,2,Business,3,UK,600,2,Confirmed,28
+2024-01,Europe,Resort,Leisure,OTA,HB,45,20000,30,5,Leisure,5,France,667,4,Cancelled,35
+2024-01,Asia,City,Corporate,Direct,FB,15,18000,20,1,Business,2,Japan,900,3,Confirmed,22
+2024-01,Asia,Resort,Leisure,OTA,BB,60,22000,35,3,Leisure,4,China,629,5,Cancelled,39
+2024-01,North America,City,Corporate,Direct,HB,20,16000,22,2,Business,3,USA,727,2,Confirmed,25
+2024-01,North America,Resort,Leisure,OTA,FB,40,19000,28,4,Leisure,6,Canada,679,3,Cancelled,34
+2024-02,Europe,City,Corporate,Direct,BB,25,15500,26,1,Business,2,Germany,596,2,Confirmed,28
+2024-02,Europe,Resort,Leisure,OTA,HB,50,21000,32,3,Leisure,4,Italy,656,4,Cancelled,36
+2024-02,Asia,City,Corporate,Direct,FB,18,18500,21,2,Business,3,South Korea,881,3,Confirmed,24
+2024-02,Asia,Resort,Leisure,OTA,BB,55,22500,36,2,Leisure,5,Singapore,625,5,Cancelled,41
+2024-02,North America,City,Corporate,Direct,HB,22,16500,23,1,Business,2,Mexico,717,2,Confirmed,25
+2024-02,North America,Resort,Leisure,OTA,FB,42,19500,29,3,Leisure,4,Brazil,672,3,Cancelled,33 

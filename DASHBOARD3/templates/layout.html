@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Hotel Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@4.1.0/dist/chartjs-chart-matrix.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3949AB',
+                        secondary: '#009688',
+                        background: '#FAFAFA'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background">
+    <!-- Primary Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h2 class="text-xl font-bold text-primary">Hotel Analytics Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="px-3 py-2 rounded-md text-sm font-medium {% if request.path == '/' %}bg-primary text-white{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                        Strategic Dashboard
+                    </a>
+                    <a href="/dashboard-b" class="px-3 py-2 rounded-md text-sm font-medium {% if request.path == '/dashboard-b' %}bg-primary text-white{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                        Tactical Dashboard
+                    </a>
+                    <a href="/dashboard-c" class="px-3 py-2 rounded-md text-sm font-medium {% if request.path == '/dashboard-c' %}bg-primary text-white{% else %}text-gray-700 hover:bg-gray-100{% endif %}">
+                        Operational Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if request.path == '/dashboard-c' %}
+    <script src="{{ url_for('static', filename='js/operational.js') }}"></script>
+    {% endif %}
+</body>
+</html> 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operational Dashboard</title>
+    <!-- Use explicit Tailwind CDN version for reliability -->
+    <script src="https://cdn.tailwindcss.com/3.4.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <h1 class="text-xl font-bold text-gray-900">Operational Dashboard</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Chart 1: Daily Occupancy -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Daily Occupancy</h2>
+                    <div class="h-72">
+                        <canvas id="chart1" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 2: Revenue by Room Type -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Revenue by Room Type</h2>
+                    <div class="h-72">
+                        <canvas id="chart2" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 3: Average Daily Rate -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Average Daily Rate</h2>
+                    <div class="h-72">
+                        <canvas id="chart3" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 4: Room Service Orders -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Room Service Orders</h2>
+                    <div class="h-72">
+                        <canvas id="chart4" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 5: Staff Productivity -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Staff Productivity</h2>
+                    <div class="h-72">
+                        <canvas id="chart5" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 6: Maintenance Requests -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Maintenance Requests</h2>
+                    <div class="h-72">
+                        <canvas id="chart6" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 7: Guest Satisfaction -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Guest Satisfaction</h2>
+                    <div class="h-72">
+                        <canvas id="chart7" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+                <!-- Chart 8: Energy Consumption -->
+                <div class="bg-white p-4 rounded-2xl shadow h-96">
+                    <h2 class="text-lg font-semibold mb-2">Energy Consumption</h2>
+                    <div class="h-72">
+                        <canvas id="chart8" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- Chart.js scripts go here. Make sure to remove any code for 'Lead Time by Room Type' and 'Daily Booking Volume' charts. -->
+    <script>
+        new Chart(document.getElementById('cancellationStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Not Canceled', 'Canceled'],
+                datasets: [{
+                    data: [notCanceledValue, canceledValue],
+                    backgroundColor: ['#43A047', '#E53935'],
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'rgba(255,255,255,0.9)',
+                            font: { weight: 'bold' }
+                        }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('customerTypeChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Contract', 'Group', 'Transient', 'Transient-Party'],
+                datasets: [{
+                    label: 'Bookings',
+                    data: [value1, value2, value3, value4],
+                    backgroundColor: [
+                        '#A5D6A7', // Contract
+                        '#90CAF9', // Group
+                        '#FFF59D', // Transient
+                        '#FFCC80'  // Transient-Party
+                    ],
+                    borderColor: '#888',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: commonOptions
+        });
+    </script>
+</body>
+</html> 
